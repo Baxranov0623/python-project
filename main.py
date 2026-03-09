@@ -58,7 +58,7 @@ menu_text: str = """
 5.Withdraw
 6.View Transactions
 7.Delete Account
-8.Exit
+8.Exit 
 ======================
 """
 # =================  Core logic
