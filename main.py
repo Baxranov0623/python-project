@@ -21,7 +21,7 @@ class Transaction:
         self.datetime = datetime
 
     def __str__(self) -> str:
-        return f"Transition <id={str(self.id)}>"
+        return f"{self.sender_name} - {self.receiver_name} - {self.amount} - {self.status}"
 
 
 class BankAccount:
@@ -38,12 +38,33 @@ class BankAccount:
         self.account_number = account_number
         self.balance = balance
         self.created_at = created_at
-        self.transaction: list[Transaction] = []
+        self.transactions: list[Transaction] = []
 
     def __str__(self):
         return f"BankAccount <name= {self.name}>"
+    def deposity(self,amount:int):
+        transaction=Transaction(uuid.uuid4(),'deposit','air',self.name,amount,
+                                'pending',datetime.now(timezone.utc))
+        if amount>0:
+            self.balance+=amount
+            transaction.status='success'
+        else:
+            transaction.status='failed'
+        self.transactions.append(transaction)
+        return self.balance
+    def withdraw(self,amount:int):
+        transaction=Transaction(uuid.uuid4(),'withdraw',self.name,'air',amount,
+                                'pending',datetime.now(timezone.utc))
+        if 0<amount<=self.balance:
+            self.balance-=amount
+            transaction.status='success'
+        else:
+            transaction.status='failed'
+        return self.balance
+    def view_transactions(self):
+        return self.transactions
 
-
+        
 
 
 # =====Globals
@@ -102,17 +123,22 @@ def search_account():
 
 
 
-def deposity():
-    pass
 
-def withdraw():
-    pass
 
-def view_transactions():
-    pass
 
-def delete_account():
-    pass
+
+
+def delete_account(card_number):
+    global accounts
+    for acc in accounts:
+        if acc.account_number==card_number:
+            accounts.remove(acc)
+            print("Akkount o'chirildi !")
+            return
+    print("Account not found")
+
+
+    
 
 
 
@@ -132,13 +158,30 @@ def main_menu():
         elif choice==3:
             search_account()
         elif choice==4:
-            deposity()
+           card_number=input("card_number= ")
+           for acc in accounts:
+               if acc.account_number==card_number:
+                   amount=int(input("amount= "))
+                   acc.deposity(amount)
+           
         elif choice==5:
-            withdraw()
+           card_number=input("card_number= ")
+           for acc in accounts:
+               if acc.account_number==card_number:
+                   amount=int(input("amount= "))
+                   acc.withdraw(amount)
         elif choice==6:
-            view_transactions()
+            transaction=None
+            card_number=input("card_number= ")
+            for acc in accounts:
+               if acc.account_number==card_number:
+                   transaction=acc.view_transactions()
+            for t in transaction:
+                print(str(t))
+                   
         elif choice==7:
-            delete_account()
+            card_number=input("card_number= ")
+            delete_account(card_number)
         else:
             print('Exit')
             break
